@@ -1,0 +1,37 @@
+﻿@model WebFrontend.Models.OrderModel
+
+@{
+    ViewBag.Title = "Place Order";
+}
+
+<h2>Place Order</h2>
+
+@using (Html.BeginForm())
+{
+  <fieldset>
+    <table class="table">
+      <thead>
+        <tr>
+          <td>Menu #</td>
+          <td>Description</td>
+          <td>Number To Order</td>
+        </tr>
+      </thead>
+      <tbody>
+        @for (int i = 0; i < Model.Items.Count; i++)
+        {
+            <tr>
+              <td>
+                @Model.Items[i].MenuNumber
+                @Html.HiddenFor(m => m.Items[i].MenuNumber)
+              </td>
+              <td>@Model.Items[i].Description</td>
+              <td>@Html.TextBoxFor(m => m.Items[i].NumberToOrder)</td>
+            </tr>
+        }
+      </tbody>
+    </table>
+
+    <button type="submit" class="btn">Place Order</button>
+  </fieldset>
+}

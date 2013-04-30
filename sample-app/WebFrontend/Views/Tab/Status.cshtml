@@ -1,0 +1,86 @@
+﻿@model CafeReadModels.OpenTabs.TabStatus
+
+@{
+    ViewBag.Title = "Tab Status";
+}
+
+<h2>Tab For Table @Model.TableNumber</h2>
+
+<div>
+  <i class="icon-plus"></i>
+  @Html.ActionLink("Order Food/Drink", "Order", new { id = Model.TableNumber })
+</div>
+
+@if (Model.ToServe.Any())
+{
+    using (Html.BeginForm("MarkServed", "Tab", new { id = Model.TableNumber }))
+    {
+        var i = 0;
+        <h3>Items To Serve</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <td>Menu #</td>
+              <td>Description</td>
+              <td>Mark Served</td>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var item in Model.ToServe)
+            {
+                <tr>
+                  <td>@item.MenuNumber</td>
+                  <td>@item.Description</td>
+                  <td>@Html.CheckBox(string.Format("served_{0}_{1}", i++, item.MenuNumber.ToString()))</td>
+                </tr>
+            }
+          </tbody>
+        </table>
+    
+        <button type="submit" class="btn">Mark Served</button>
+    }
+}
+
+@if (Model.InPreparation.Any())
+{
+    <h3>Food In Preparation</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <td>Menu #</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in Model.InPreparation)
+        {
+            <tr>
+              <td>@item.MenuNumber</td>
+              <td>@item.Description</td>
+            </tr>
+        }
+      </tbody>
+    </table>
+}
+
+@if (Model.Served.Any())
+{
+    <h3>Items Already Served</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <td>Menu #</td>
+          <td>Description</td>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in Model.Served)
+        {
+            <tr>
+              <td>@item.MenuNumber</td>
+              <td>@item.Description</td>
+            </tr>
+        }
+      </tbody>
+    </table>
+}

@@ -1,0 +1,24 @@
+﻿@model Cafe.Tab.OpenTab
+
+@{
+    ViewBag.Title = "Open Tab";
+}
+
+<h2>Open Tab</h2>
+
+@using (Html.BeginForm())
+{
+  <fieldset>
+    <label>Table Number</label>
+    @Html.TextBoxFor(m => m.TableNumber)
+   
+    <label>
+      Waiter/Waitress
+    </label>
+    @Html.DropDownListFor(m => m.Waiter, (ViewBag.WaitStaff as List<string>)
+        .Select(w => new SelectListItem { Text = w, Value = w }))
+    <br>
+
+    <button type="submit" class="btn">Open Tab</button>
+  </fieldset>
+}
