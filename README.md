@@ -58,11 +58,11 @@ If you use this approach, you may also want to consider:
 ## So, it's a framework?
 
 No. You take the code, copy it into your project, and massage it to fit your
-needs. Not using part of it? Just Delete It. Wish something worked a little
-differently? Just Change It.
+needs. Not using part of it? **Just Delete It.** Wish something worked a little
+differently? **Just Change It.**
 
-The idea is to give you a head start, saving you from writing - or working
-out how to write - this code yourself. In every non-trivial system where we've
+The idea is to give you a head start, saving you from writing &mdash; or working
+out how to write &mdash; this code yourself. In every non-trivial system where we've
 used this code, we've done some kind of modification to it. We expect you will
 experience the same need, and follow the same path.
 
@@ -102,5 +102,5 @@ point.
 
 ## Who did this?
 
-This code was built by Jonathan Worthington and Carl Mäsak as part of their
-work at [Edument AB](http://www.edument.se/).
+This code was built by Jonathan Worthington and Carl Mï¿½sak as part of their
+work at [Edument](http://www.edument.se/).
