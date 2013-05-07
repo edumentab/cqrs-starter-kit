@@ -68,7 +68,7 @@ experience the same need, and follow the same path.
 
 ## So, how do I get started?
 
-Clone the repository, then take a look at the [tutorial](http://test.cqrs.nu/Tutorial),
+Clone the repository, then take a look at the [tutorial](http://cqrs.nu/tutorial),
 which walks through the [sample application](https://github.com/edumentab/cqrs-starter-kit/tree/master/sample-app).
 
 You may also find our [CQRS FAQ](http://cqrs.nu/) useful.
