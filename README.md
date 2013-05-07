@@ -66,6 +66,13 @@ out how to write - this code yourself. In every non-trivial system where we've
 used this code, we've done some kind of modification to it. We expect you will
 experience the same need, and follow the same path.
 
+## So, how do I get started?
+
+Clone the repository, then take a look at the [tutorial](http://test.cqrs.nu/Tutorial),
+which walks through the [sample application](https://github.com/edumentab/cqrs-starter-kit/tree/master/sample-app).
+
+You may also find our [CQRS FAQ](http://cqrs.nu/) useful.
+
 ## I want to do CQRS; is this for me?
 
 Whoa there! Let's try and clear up what we mean by CQRS. Its literal meaning
@@ -93,11 +100,7 @@ Design. If you feel those kinds of ideas will be helpful to you in building a
 system, then yes, the code we're offering here may serve as a good starting
 point.
 
-## So, how do I get started?
-
-Take a look at the tutorial and the sample application.
-
 ## Who did this?
 
 This code was built by Jonathan Worthington and Carl Mäsak as part of their
-work at Edument AB.
+work at [Edument AB](http://www.edument.se/).
