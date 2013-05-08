@@ -2,9 +2,9 @@
 
 ## What is this?
 
-A bunch of code to help you get started with writing **intentful tests** for
-a domain, expressing it as **commands, events and exceptions**. These ideas
-are often associated with the CQRS pattern.
+A bunch of C# code to help you get started with writing **intentful tests**
+for a domain, expressing it as **commands, events and exceptions**. These
+ideas are often associated with the CQRS pattern.
 
 Here's an example of how a test might looks:
 
@@ -71,7 +71,14 @@ experience the same need, and follow the same path.
 Clone the repository, then take a look at the [tutorial](http://cqrs.nu/tutorial),
 which walks through the [sample application](https://github.com/edumentab/cqrs-starter-kit/tree/master/sample-app).
 
-You may also find our [CQRS FAQ](http://cqrs.nu/) useful.
+You will need a C# compiler. The starter kit uses language features from C# 3,
+however the sample application uses ASP.NET MVC 4, which needs at least Visual
+Studio 2010.
+
+You also need NUnit installed, and may need to correct the reference to it
+when first loading the project.
+
+You may also find our [DDD and CQRS FAQ](http://cqrs.nu/) useful.
 
 ## I want to do CQRS; is this for me?
 
