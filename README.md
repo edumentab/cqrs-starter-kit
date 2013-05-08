@@ -100,7 +100,13 @@ Design. If you feel those kinds of ideas will be helpful to you in building a
 system, then yes, the code we're offering here may serve as a good starting
 point.
 
+## Support and training
+
+Edument offers commercial support and training on Domain Driven Design, CQRS,
+and software architecture in general. [Contact us](http://www.edument.se/) for
+more details.
+
 ## Who did this?
 
-This code was built by Jonathan Worthington and Carl M�sak as part of their
+This code was built by Jonathan Worthington and Carl Mäsak as part of their
 work at [Edument](http://www.edument.se/).
