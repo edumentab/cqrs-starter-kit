@@ -109,6 +109,9 @@ point.
 
 ## Support and training
 
+There is a [Google Group](https://groups.google.com/forum/#!forum/edument-cqrs-ddd)
+where you can ask questions and discuss usage of the starter kit.
+
 Edument offers commercial support and training on Domain Driven Design, CQRS,
 and software architecture in general. [Contact us](http://www.edument.se/) for
 more details.
