@@ -77,7 +77,7 @@ namespace Edument.CQRS
                            gotEvents.Select(e => e.GetType().Name)
                                .Except(expectedEvents.Select(e => e.GetType().Name))));
                 }
-                else if (got is CommandHandlerNotDefiendException)
+                else if (got is CommandHandlerNotDefinedException)
                     Assert.Fail((got as Exception).Message);
                 else
                     Assert.Fail("Expected events, but got exception {0}",
@@ -91,7 +91,7 @@ namespace Edument.CQRS
             {
                 if (got is TException)
                     Assert.Pass("Got correct exception type");
-                else if (got is CommandHandlerNotDefiendException)
+                else if (got is CommandHandlerNotDefinedException)
                     Assert.Fail((got as Exception).Message);
                 else if (got is Exception)
                     Assert.Fail(string.Format(
@@ -108,7 +108,7 @@ namespace Edument.CQRS
         {
             var handler = sut as IHandleCommand<TCommand, TAggregate>;
             if (handler == null)
-                throw new CommandHandlerNotDefiendException(string.Format(
+                throw new CommandHandlerNotDefinedException(string.Format(
                     "Command handler {0} does not yet handle command {1}",
                     sut.GetType().Name, c.GetType().Name));
             return handler.Handle(al, c);
@@ -129,9 +129,9 @@ namespace Edument.CQRS
             return new StreamReader(ms).ReadToEnd();
         }
 
-        private class CommandHandlerNotDefiendException : Exception
+        private class CommandHandlerNotDefinedException : Exception
         {
-            public CommandHandlerNotDefiendException(string msg) : base(msg) { }
+            public CommandHandlerNotDefinedException(string msg) : base(msg) { }
         }
     }
 }
