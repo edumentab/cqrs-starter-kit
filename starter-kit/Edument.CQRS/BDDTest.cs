@@ -70,12 +70,10 @@ namespace Edument.CQRS
                                     expectedEvents[i].GetType().Name, gotEvents[i].GetType().Name));
                     else if (gotEvents.Length < expectedEvents.Length)
                         Assert.Fail(string.Format("Expected event(s) missing: {0}",
-                            expectedEvents.Select(e => e.GetType().Name)
-                                .Except(gotEvents.Select(e => e.GetType().Name))));
+                            string.Join(", ", EventDiff(expectedEvents, gotEvents))));
                     else
                         Assert.Fail(string.Format("Unexpected event(s) emitted: {0}",
-                           gotEvents.Select(e => e.GetType().Name)
-                               .Except(expectedEvents.Select(e => e.GetType().Name))));
+                            string.Join(", ", EventDiff(gotEvents, expectedEvents))));
                 }
                 else if (got is CommandHandlerNotDefinedException)
                     Assert.Fail((got as Exception).Message);
@@ -83,6 +81,14 @@ namespace Edument.CQRS
                     Assert.Fail("Expected events, but got exception {0}",
                         got.GetType().Name);
             };
+        }
+
+        private string[] EventDiff(object[] a, object[] b)
+        {
+            var diff = a.Select(e => e.GetType().Name).ToList();
+            foreach (var remove in b.Select(e => e.GetType().Name))
+                diff.Remove(remove);
+            return diff.ToArray();
         }
 
         protected Action<object> ThenFailWith<TException>()
