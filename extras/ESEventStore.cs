@@ -11,7 +11,8 @@ using EventStore.ClientAPI;
 namespace Edument.CQRS
 {
     // An implementation of IEventStore in terms of EventStore, available from
-    // http://geteventstore.com/
+    // http://geteventstore.com/. Install the EventStore.ClientAPI from NuGet,
+    // and then this should Just Work.
     public class ESEventStore : IEventStore
     {
         private IEventStoreConnection conn = EventStoreConnection
