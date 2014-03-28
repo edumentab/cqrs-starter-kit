@@ -49,7 +49,6 @@
     <Compile Include="Tab\PlaceOrder.cs" />
     <Compile Include="Tab\MarkFoodServed.cs" />
     <Compile Include="Tab\TabAggregate.cs" />
-    <Compile Include="Tab\TabCommandHandlers.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Edument.CQRS\Edument.CQRS.csproj">

@@ -18,9 +18,9 @@ namespace Edument.CQRS
         public int EventsLoaded { get; private set; }
 
         /// <summary>
-        /// The unique ID of the aggregate, if currently known.
+        /// The unique ID of the aggregate.
         /// </summary>
-        public Guid? Id { get; internal set; }
+        public Guid Id { get; internal set; }
 
         /// <summary>
         /// Enuerates the supplied events and applies them in order to the aggregate.

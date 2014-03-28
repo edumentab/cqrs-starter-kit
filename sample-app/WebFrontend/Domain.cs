@@ -18,7 +18,7 @@ namespace WebFrontend
         {
             Dispatcher = new MessageDispatcher(new InMemoryEventStore());
             
-            Dispatcher.ScanInstance(new TabCommandHandlers());
+            Dispatcher.ScanInstance(new TabAggregate());
 
             OpenTabQueries = new OpenTabs();
             Dispatcher.ScanInstance(OpenTabQueries);

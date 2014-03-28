@@ -44,7 +44,6 @@
     <Compile Include="Something\Exceptions.cs" />
     <Compile Include="Something\MakeSomethingHappen.cs" />
     <Compile Include="Something\SomethingAggregate.cs" />
-    <Compile Include="Something\SomethingCommandHandlers.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Edument.CQRS\Edument.CQRS.csproj">

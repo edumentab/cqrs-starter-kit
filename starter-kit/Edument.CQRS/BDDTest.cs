@@ -14,23 +14,21 @@ namespace Edument.CQRS
     /// Provides infrastructure for a set of tests on a given command handler
     /// and aggregate.
     /// </summary>
-    /// <typeparam name="TCommandHandler"></typeparam>
     /// <typeparam name="TAggregate"></typeparam>
-    public class BDDTest<TCommandHandler, TAggregate>
-        where TCommandHandler : new()
+    public class BDDTest<TAggregate>
         where TAggregate : Aggregate, new()
     {
-        private TCommandHandler sut;
+        private TAggregate sut;
 
         [SetUp]
         public void BDDTestSetup()
         {
-            sut = new TCommandHandler();
+            sut = new TAggregate();
         }
 
         protected void Test(IEnumerable given, Func<TAggregate, object> when, Action<object> then)
         {
-            then(when(ApplyEvents(new TAggregate(), given)));
+            then(when(ApplyEvents(sut, given)));
         }
 
         protected IEnumerable Given(params object[] events)
@@ -44,7 +42,7 @@ namespace Edument.CQRS
             {
                 try
                 {
-                    return DispatchCommand(_ => agg, command).Cast<object>().ToArray();
+                    return DispatchCommand(command).Cast<object>().ToArray();
                 }
                 catch (Exception e)
                 {
@@ -75,7 +73,7 @@ namespace Edument.CQRS
                         Assert.Fail(string.Format("Unexpected event(s) emitted: {0}",
                             string.Join(", ", EventDiff(gotEvents, expectedEvents))));
                 }
-                else if (got is CommandHandlerNotDefinedException)
+                else if (got is CommandHandlerNotDefiendException)
                     Assert.Fail((got as Exception).Message);
                 else
                     Assert.Fail("Expected events, but got exception {0}",
@@ -97,7 +95,7 @@ namespace Edument.CQRS
             {
                 if (got is TException)
                     Assert.Pass("Got correct exception type");
-                else if (got is CommandHandlerNotDefinedException)
+                else if (got is CommandHandlerNotDefiendException)
                     Assert.Fail((got as Exception).Message);
                 else if (got is Exception)
                     Assert.Fail(string.Format(
@@ -110,14 +108,14 @@ namespace Edument.CQRS
             };
         }
 
-        private IEnumerable DispatchCommand<TCommand>(Func<Guid, TAggregate> al, TCommand c)
+        private IEnumerable DispatchCommand<TCommand>(TCommand c)
         {
-            var handler = sut as IHandleCommand<TCommand, TAggregate>;
+            var handler = sut as IHandleCommand<TCommand>;
             if (handler == null)
-                throw new CommandHandlerNotDefinedException(string.Format(
+                throw new CommandHandlerNotDefiendException(string.Format(
                     "Command handler {0} does not yet handle command {1}",
                     sut.GetType().Name, c.GetType().Name));
-            return handler.Handle(al, c);
+            return handler.Handle(c);
         }
 
         private TAggregate ApplyEvents(TAggregate agg, IEnumerable events)
@@ -135,9 +133,9 @@ namespace Edument.CQRS
             return new StreamReader(ms).ReadToEnd();
         }
 
-        private class CommandHandlerNotDefinedException : Exception
+        private class CommandHandlerNotDefiendException : Exception
         {
-            public CommandHandlerNotDefinedException(string msg) : base(msg) { }
+            public CommandHandlerNotDefiendException(string msg) : base(msg) { }
         }
     }
 }

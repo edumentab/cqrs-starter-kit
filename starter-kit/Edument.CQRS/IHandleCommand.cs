@@ -6,8 +6,8 @@ using System.Collections;
 
 namespace Edument.CQRS
 {
-    public interface IHandleCommand<TCommand, TAggregate>
+    public interface IHandleCommand<TCommand>
     {
-        IEnumerable Handle(Func<Guid, TAggregate> al, TCommand c);
+        IEnumerable Handle(TCommand c);
     }
 }

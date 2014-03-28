@@ -26,18 +26,8 @@ namespace Edument.CQRS
                 return new ArrayList();
         }
 
-        public void SaveEventsFor<TAggregate>(Guid? id, int eventsLoaded, ArrayList newEvents)
-        {
-            // Establish the aggregate ID to save the events under and ensure they
-            // all have the correct ID.
-            if (newEvents.Count == 0)
-                return;
-            Guid aggregateId = id ?? GetAggregateIdFromEvent(newEvents[0]);
-            foreach (var e in newEvents)
-                if (GetAggregateIdFromEvent(e) != aggregateId)
-                    throw new InvalidOperationException(
-                        "Cannot save events reporting inconsistent aggregate IDs");
-            
+        public void SaveEventsFor<TAggregate>(Guid aggregateId, int eventsLoaded, ArrayList newEvents)
+        {   
             // Get or create stream.
             var s = store.GetOrAdd(aggregateId, _ => new Stream());
 

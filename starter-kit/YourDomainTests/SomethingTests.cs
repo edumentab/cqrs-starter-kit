@@ -10,7 +10,7 @@ using Events.Something;
 namespace YourDomainTests
 {
     [TestFixture]
-    public class SomethingTests : BDDTest<SomethingCommandHandlers, SomethingAggregate>
+    public class SomethingTests : BDDTest<SomethingAggregate>
     {
         private Guid testId;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,12 @@ using Events.Cafe;
 namespace Cafe.Tab
 {
     public class TabAggregate : Aggregate,
+        IHandleCommand<OpenTab>,
+        IHandleCommand<PlaceOrder>,
+        IHandleCommand<MarkDrinksServed>,
+        IHandleCommand<MarkFoodPrepared>,
+        IHandleCommand<MarkFoodServed>,
+        IHandleCommand<CloseTab>,
         IApplyEvent<TabOpened>,
         IApplyEvent<DrinksOrdered>,
         IApplyEvent<FoodOrdered>,
@@ -19,21 +26,106 @@ namespace Cafe.Tab
         private List<OrderedItem> outstandingDrinks = new List<OrderedItem>();
         private List<OrderedItem> outstandingFood = new List<OrderedItem>();
         private List<OrderedItem> preparedFood = new List<OrderedItem>();
-        
-        public bool Open { get; private set; }
-        public decimal ServedItemsValue { get; private set; }
+        private bool open;
+        private decimal servedItemsValue;
 
-        public bool AreDrinksOutstanding(List<int> menuNumbers)
+        public IEnumerable Handle(OpenTab c)
+        {
+            yield return new TabOpened
+            {
+                Id = c.Id,
+                TableNumber = c.TableNumber,
+                Waiter = c.Waiter
+            };
+        }
+
+        public IEnumerable Handle(PlaceOrder c)
+        {
+            if (!open)
+                throw new TabNotOpen();
+
+            var drink = c.Items.Where(i => i.IsDrink).ToList();
+            if (drink.Any())
+                yield return new DrinksOrdered
+                {
+                    Id = c.Id,
+                    Items = drink
+                };
+
+            var food = c.Items.Where(i => !i.IsDrink).ToList();
+            if (food.Any())
+                yield return new FoodOrdered
+                {
+                    Id = c.Id,
+                    Items = food
+                };
+        }
+
+        public IEnumerable Handle(MarkDrinksServed c)
+        {
+            if (!AreDrinksOutstanding(c.MenuNumbers))
+                throw new DrinksNotOutstanding();
+
+            yield return new DrinksServed
+            {
+                Id = c.Id,
+                MenuNumbers = c.MenuNumbers
+            };
+        }
+
+        public IEnumerable Handle(MarkFoodPrepared c)
+        {
+            if (!IsFoodOutstanding(c.MenuNumbers))
+                throw new FoodNotOutstanding();
+
+            yield return new FoodPrepared
+            {
+                Id = c.Id,
+                MenuNumbers = c.MenuNumbers
+            };
+        }
+
+        public IEnumerable Handle(MarkFoodServed c)
+        {
+            if (!IsFoodPrepared(c.MenuNumbers))
+                throw new FoodNotPrepared();
+
+            yield return new FoodServed
+            {
+                Id = c.Id,
+                MenuNumbers = c.MenuNumbers
+            };
+        }
+
+        public IEnumerable Handle(CloseTab c)
+        {
+            if (!open)
+                throw new TabNotOpen();
+            if (HasUnservedItems())
+                throw new TabHasUnservedItems();
+            if (c.AmountPaid < servedItemsValue)
+                throw new MustPayEnough();
+
+            yield return new TabClosed
+            {
+                Id = c.Id,
+                AmountPaid = c.AmountPaid,
+                OrderValue = servedItemsValue,
+                TipValue = c.AmountPaid - servedItemsValue
+            };
+        }
+
+        private bool AreDrinksOutstanding(List<int> menuNumbers)
         {
             return AreAllInList(want: menuNumbers, have: outstandingDrinks);
         }
 
-        public bool IsFoodOutstanding(List<int> menuNumbers)
+        private bool IsFoodOutstanding(List<int> menuNumbers)
         {
             return AreAllInList(want: menuNumbers, have: outstandingFood);
         }
 
-        public bool IsFoodPrepared(List<int> menuNumbers)
+        private bool IsFoodPrepared(List<int> menuNumbers)
         {
             return AreAllInList(want: menuNumbers, have: preparedFood);
         }
@@ -56,7 +148,7 @@ namespace Cafe.Tab
 
         public void Apply(TabOpened e)
         {
-            Open = true;
+            open = true;
         }
 
         public void Apply(DrinksOrdered e)
@@ -75,7 +167,7 @@ namespace Cafe.Tab
             {
                 var item = outstandingDrinks.First(d => d.MenuNumber == num);
                 outstandingDrinks.Remove(item);
-                ServedItemsValue += item.Price;
+                servedItemsValue += item.Price;
             }
         }
 
@@ -95,13 +187,13 @@ namespace Cafe.Tab
             {
                 var item = preparedFood.First(f => f.MenuNumber == num);
                 preparedFood.Remove(item);
-                ServedItemsValue += item.Price;
+                servedItemsValue += item.Price;
             }
         }
 
         public void Apply(TabClosed e)
         {
-            Open = false;
+            open = false;
         }
     }
 }

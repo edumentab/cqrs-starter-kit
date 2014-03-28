@@ -58,13 +58,12 @@ namespace Edument.CQRS
         }
 
         /// <summary>
-        /// Adds an object that handles the specified command, by virtue of implementing
-        /// the IHandleCommand interface.
+        /// Registers an aggregate as being the handler for a particular
+        /// command.
         /// </summary>
-        /// <typeparam name="TCommand"></typeparam>
         /// <typeparam name="TAggregate"></typeparam>
         /// <param name="handler"></param>
-        public void AddHandlerFor<TCommand, TAggregate>(IHandleCommand<TCommand, TAggregate> handler)
+        public void AddHandlerFor<TCommand, TAggregate>()
             where TAggregate : Aggregate, new()
         {
             if (commandHandlers.ContainsKey(typeof(TCommand)))
@@ -72,33 +71,23 @@ namespace Edument.CQRS
             
             commandHandlers.Add(typeof(TCommand), c =>
                 {
-                    // Create up an empty aggregate.
+                    // Create an empty aggregate.
                     var agg = new TAggregate();
 
-                    // The aggregate loader function, when given an ID, loads and applies
-                    // all of the events. It stashes the ID to indicate we loaded up the
-                    // aggregate (and thus have to pay attention to version when we save
-                    // back the events). Note that in the case where the aggregate's current
-                    // state was never looked at, it doesn't matter when we apply the
-                    // event; it has no dependency on the past.
-                    Func<Guid, TAggregate> al = id =>
-                        {
-                            agg.Id = id;
-                            agg.ApplyEvents(eventStore.LoadEventsFor<TAggregate>(id));
-                            return agg;
-                        };
+                    // Load the aggregate with events.
+                    agg.Id = ((dynamic)c).Id;
+                    agg.ApplyEvents(eventStore.LoadEventsFor<TAggregate>(agg.Id));
                     
                     // With everything set up, we invoke the command handler, collecting the
                     // events that it produces.
                     var resultEvents = new ArrayList();
-                    foreach (var e in handler.Handle(al, (TCommand)c))
+                    foreach (var e in (agg as IHandleCommand<TCommand>).Handle((TCommand)c))
                         resultEvents.Add(e);
                     
                     // Store the events in the event store.
-                    eventStore.SaveEventsFor<TAggregate>(
-                        agg.Id,
-                        agg.EventsLoaded,
-                        resultEvents);
+                    if (resultEvents.Count > 0)
+                        eventStore.SaveEventsFor<TAggregate>(agg.Id,
+                            agg.EventsLoaded, resultEvents);
 
                     // Publish them to all subscribers.
                     foreach (var e in resultEvents)
@@ -133,18 +122,17 @@ namespace Edument.CQRS
                 from t in ass.GetTypes()
                 from i in t.GetInterfaces()
                 where i.IsGenericType
-                where i.GetGenericTypeDefinition() == typeof(IHandleCommand<,>)
+                where i.GetGenericTypeDefinition() == typeof(IHandleCommand<>)
                 let args = i.GetGenericArguments()
                 select new
                 {
-                    Type = t,
                     CommandType = args[0],
-                    AggregateType = args[1]
+                    AggregateType = t
                 };
             foreach (var h in handlers)
                 this.GetType().GetMethod("AddHandlerFor") 
                     .MakeGenericMethod(h.CommandType, h.AggregateType)
-                    .Invoke(this, new object[] { CreateInstanceOf(h.Type) });
+                    .Invoke(this, new object[] { });
 
             // Scan for and register subscribers.
             var subscriber =
@@ -174,17 +162,17 @@ namespace Edument.CQRS
             var handlers =
                 from i in instance.GetType().GetInterfaces()
                 where i.IsGenericType
-                where i.GetGenericTypeDefinition() == typeof(IHandleCommand<,>)
+                where i.GetGenericTypeDefinition() == typeof(IHandleCommand<>)
                 let args = i.GetGenericArguments()
                 select new
                 {
                     CommandType = args[0],
-                    AggregateType = args[1]
+                    AggregateType = instance.GetType()
                 };
             foreach (var h in handlers)
                 this.GetType().GetMethod("AddHandlerFor")
                     .MakeGenericMethod(h.CommandType, h.AggregateType)
-                    .Invoke(this, new object[] { instance });
+                    .Invoke(this, new object[] { });
 
             // Scan for and register subscribers.
             var subscriber =
