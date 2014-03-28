@@ -46,6 +46,24 @@ namespace Edument.CQRS
         }
 
         /// <summary>
+        /// Runs a query on an aggreate, promising consistency (up to the last
+        /// operation successfully performed on it).
+        /// </summary>
+        /// <typeparam name="TAggregate"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public TResult QueryAggregate<TAggregate, TResult>(Guid id, Func<TAggregate, TResult> query)
+            where TAggregate : Aggregate, new()
+        {
+            var agg = new TAggregate();
+            agg.Id = id;
+            agg.ApplyEvents(eventStore.LoadEventsFor<TAggregate>(id));
+            return query(agg);
+        }
+
+        /// <summary>
         /// Publishes the specified event to all of its subscribers.
         /// </summary>
         /// <param name="e"></param>

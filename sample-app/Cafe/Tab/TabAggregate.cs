@@ -26,8 +26,12 @@ namespace Cafe.Tab
         private List<OrderedItem> outstandingDrinks = new List<OrderedItem>();
         private List<OrderedItem> outstandingFood = new List<OrderedItem>();
         private List<OrderedItem> preparedFood = new List<OrderedItem>();
+        private List<OrderedItem> served = new List<OrderedItem>();
         private bool open;
+        private int tableNumber;
         private decimal servedItemsValue;
+
+        // Command handlers.
 
         public IEnumerable Handle(OpenTab c)
         {
@@ -115,6 +119,99 @@ namespace Cafe.Tab
             };
         }
 
+        // Consistent aggregate queries.
+
+        public TabStatus GetTabStatus()
+        {
+            return new TabStatus
+            {
+                TabId = Id,
+                TableNumber = tableNumber,
+                ToServe = ToTabItems(outstandingDrinks.Concat(preparedFood)),
+                InPreparation = ToTabItems(outstandingFood),
+                Served = ToTabItems(served)
+            };
+        }
+
+        public TabInvoice GetInvoice()
+        {
+            return new TabInvoice
+            {
+                TabId = Id,
+                TableNumber = tableNumber,
+                Items = ToTabItems(served),
+                HasUnservedItems = outstandingDrinks.Any() || outstandingFood.Any() || preparedFood.Any(),
+                Total = servedItemsValue
+            };
+        }
+
+        private List<TabItem> ToTabItems(IEnumerable<OrderedItem> items)
+        {
+            return items.Select(od => new TabItem
+                {
+                    MenuNumber = od.MenuNumber,
+                    Description = od.Description,
+                    Price = od.Price
+                }).ToList();
+        }
+
+        // Event appliers.
+
+        public void Apply(TabOpened e)
+        {
+            open = true;
+            tableNumber = e.TableNumber;
+        }
+
+        public void Apply(DrinksOrdered e)
+        {
+            outstandingDrinks.AddRange(e.Items);
+        }
+
+        public void Apply(FoodOrdered e)
+        {
+            outstandingFood.AddRange(e.Items);
+        }
+
+        public void Apply(DrinksServed e)
+        {
+            foreach (var num in e.MenuNumbers)
+            {
+                var item = outstandingDrinks.First(d => d.MenuNumber == num);
+                outstandingDrinks.Remove(item);
+                served.Add(item);
+                servedItemsValue += item.Price;
+            }
+        }
+
+        public void Apply(FoodPrepared e)
+        {
+            foreach (var num in e.MenuNumbers)
+            {
+                var item = outstandingFood.First(f => f.MenuNumber == num);
+                outstandingFood.Remove(item);
+                preparedFood.Add(item);
+            }
+        }
+
+        public void Apply(FoodServed e)
+        {
+            foreach (var num in e.MenuNumbers)
+            {
+                var item = preparedFood.First(f => f.MenuNumber == num);
+                preparedFood.Remove(item);
+                served.Add(item);
+                servedItemsValue += item.Price;
+            }
+        }
+
+        public void Apply(TabClosed e)
+        {
+            open = false;
+        }
+
+        // Private logic methods.
+
         private bool AreDrinksOutstanding(List<int> menuNumbers)
         {
             return AreAllInList(want: menuNumbers, have: outstandingDrinks);
@@ -141,59 +238,9 @@ namespace Cafe.Tab
             return true;
         }
 
-        public bool HasUnservedItems()
+        private bool HasUnservedItems()
         {
             return outstandingDrinks.Any() || outstandingFood.Any() || preparedFood.Any();
-        }
-
-        public void Apply(TabOpened e)
-        {
-            open = true;
-        }
-
-        public void Apply(DrinksOrdered e)
-        {
-            outstandingDrinks.AddRange(e.Items);
-        }
-
-        public void Apply(FoodOrdered e)
-        {
-            outstandingFood.AddRange(e.Items);
-        }
-
-        public void Apply(DrinksServed e)
-        {
-            foreach (var num in e.MenuNumbers)
-            {
-                var item = outstandingDrinks.First(d => d.MenuNumber == num);
-                outstandingDrinks.Remove(item);
-                servedItemsValue += item.Price;
-            }
-        }
-
-        public void Apply(FoodPrepared e)
-        {
-            foreach (var num in e.MenuNumbers)
-            {
-                var item = outstandingFood.First(f => f.MenuNumber == num);
-                outstandingFood.Remove(item);
-                preparedFood.Add(item);
-            }
-        }
-
-        public void Apply(FoodServed e)
-        {
-            foreach (var num in e.MenuNumbers)
-            {
-                var item = preparedFood.First(f => f.MenuNumber == num);
-                preparedFood.Remove(item);
-                servedItemsValue += item.Price;
-            }
-        }
-
-        public void Apply(TabClosed e)
-        {
-            open = false;
         }
     }
 }

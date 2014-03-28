@@ -16,42 +16,23 @@ namespace CafeReadModels
         ISubscribeTo<FoodServed>,
         ISubscribeTo<TabClosed>
     {
+        internal enum ItemStatus { NeedsPreparing, NeedsServing, Served }
+
         public class TabItem
         {
             public int MenuNumber;
             public string Description;
-            public decimal Price;
-        }
-
-        public class TabStatus
-        {
-            public Guid TabId;
-            public int TableNumber;
-            public List<TabItem> ToServe;
-            public List<TabItem> InPreparation;
-            public List<TabItem> Served;
-        }
-
-        public class TabInvoice
-        {
-            public Guid TabId;
-            public int TableNumber;
-            public List<TabItem> Items;
-            public decimal Total;
-            public bool HasUnservedItems;
+            internal ItemStatus Status;
         }
 
         private class Tab
         {
             public int TableNumber;
             public string Waiter;
-            public List<TabItem> ToServe;
-            public List<TabItem> InPreparation;
-            public List<TabItem> Served;
+            public List<TabItem> Items;
         }
 
-        private Dictionary<Guid, Tab> todoByTab =
-            new Dictionary<Guid,Tab>();
+        private Dictionary<Guid, Tab> todoByTab = new Dictionary<Guid, Tab>();
 
         public List<int> ActiveTableNumbers()
         {
@@ -66,12 +47,15 @@ namespace CafeReadModels
             lock (todoByTab)
                 return (from tab in todoByTab
                         where tab.Value.Waiter == waiter
+                        let toServe = tab.Value.Items
+                            .Where(i => i.Status == ItemStatus.NeedsServing)
+                            .ToList()
+                        where toServe.Count > 0
                         select new
                         {
                             TableNumber = tab.Value.TableNumber,
-                            ToServe = CopyItems(tab.Value, t => t.ToServe)
+                            ToServe = toServe
                         })
-                        .Where(t => t.ToServe.Count > 0)
                         .ToDictionary(k => k.TableNumber, v => v.ToServe);
         }
 
@@ -84,45 +68,6 @@ namespace CafeReadModels
                        ).First();
         }
 
-        public TabStatus TabForTable(int table)
-        {
-            lock (todoByTab)
-                return (from tab in todoByTab
-                        where tab.Value.TableNumber == table
-                        select new TabStatus
-                        {
-                            TabId = tab.Key,
-                            TableNumber = tab.Value.TableNumber,
-                            ToServe = CopyItems(tab.Value, t => t.ToServe),
-                            InPreparation = CopyItems(tab.Value, t => t.InPreparation),
-                            Served = CopyItems(tab.Value, t => t.Served)
-                        })
-                        .First();
-        }
-
-        public TabInvoice InvoiceForTable(int table)
-        {
-            KeyValuePair<Guid, Tab> tab;
-            lock (todoByTab)
-                tab = todoByTab.First(t => t.Value.TableNumber == table);
-
-            lock (tab.Value)
-                return new TabInvoice
-                {
-                    TabId = tab.Key,
-                    TableNumber = tab.Value.TableNumber,
-                    Items = new List<TabItem>(tab.Value.Served),
-                    Total = tab.Value.Served.Sum(i => i.Price),
-                    HasUnservedItems = tab.Value.InPreparation.Any() || tab.Value.ToServe.Any()
-                };
-        }
-
-        private List<TabItem> CopyItems(Tab tableTodo, Func<Tab, List<TabItem>> selector)
-        {
-            lock (tableTodo)
-                return new List<TabItem>(selector(tableTodo));
-        }
-
         public void Handle(TabOpened e)
         {
             lock (todoByTab)
@@ -130,9 +75,7 @@ namespace CafeReadModels
                 {
                     TableNumber = e.TableNumber,
                     Waiter = e.Waiter,
-                    ToServe = new List<TabItem>(),
-                    InPreparation = new List<TabItem>(),
-                    Served = new List<TabItem>()
+                    Items = new List<TabItem>()
                 });
         }
 
@@ -143,36 +86,34 @@ namespace CafeReadModels
                     {
                         MenuNumber = drink.MenuNumber,
                         Description = drink.Description,
-                        Price = drink.Price
-                    }),
-                t => t.ToServe);
+                        Status = ItemStatus.NeedsServing
+                    }));
         }
 
         public void Handle(FoodOrdered e)
         {
             AddItems(e.Id,
-                e.Items.Select(drink => new TabItem
+                e.Items.Select(food => new TabItem
                 {
-                    MenuNumber = drink.MenuNumber,
-                    Description = drink.Description,
-                    Price = drink.Price
-                }),
-                t => t.InPreparation);
+                    MenuNumber = food.MenuNumber,
+                    Description = food.Description,
+                    Status = ItemStatus.NeedsPreparing
+                }));
         }
 
         public void Handle(FoodPrepared e)
         {
-            MoveItems(e.Id, e.MenuNumbers, t => t.InPreparation, t => t.ToServe);
+            ChangeStatus(e.Id, e.MenuNumbers, ItemStatus.NeedsPreparing, ItemStatus.NeedsServing);
         }
 
         public void Handle(DrinksServed e)
         {
-            MoveItems(e.Id, e.MenuNumbers, t => t.ToServe, t => t.Served);
+            ChangeStatus(e.Id, e.MenuNumbers, ItemStatus.NeedsServing, ItemStatus.Served);
         }
 
         public void Handle(FoodServed e)
         {
-            MoveItems(e.Id, e.MenuNumbers, t => t.ToServe, t => t.Served);
+            ChangeStatus(e.Id, e.MenuNumbers, ItemStatus.NeedsServing, ItemStatus.Served);
         }
 
         public void Handle(TabClosed e)
@@ -187,28 +128,23 @@ namespace CafeReadModels
                 return todoByTab[id];
         }
 
-        private void AddItems(Guid tabId, IEnumerable<TabItem> newItems, Func<Tab, List<TabItem>> to)
+        private void AddItems(Guid tabId, IEnumerable<TabItem> newItems)
         {
             var tab = getTab(tabId);
             lock (tab)
-                to(tab).AddRange(newItems);
+                tab.Items.AddRange(newItems);
         }
 
-        private void MoveItems(Guid tabId, List<int> menuNumbers,
-            Func<Tab, List<TabItem>> from, Func<Tab, List<TabItem>> to)
+        private void ChangeStatus(Guid id, List<int> menuNumbers, ItemStatus origStatus, ItemStatus newStatus)
         {
-            var tab = getTab(tabId);
+            var tab = getTab(id);
             lock (tab)
-            {
-                var fromList = from(tab);
-                var toList = to(tab);
-                foreach (var num in menuNumbers)
+                foreach (var mn in menuNumbers)
                 {
-                    var serveItem = fromList.First(f => f.MenuNumber == num);
-                    fromList.Remove(serveItem);
-                    toList.Add(serveItem);
+                    tab.Items
+                        .First(i => i.MenuNumber == mn && i.Status == origStatus)
+                        .Status = ItemStatus.NeedsServing;
                 }
-            }
         }
     }
 }

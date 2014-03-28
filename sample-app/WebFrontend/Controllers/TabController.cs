@@ -28,7 +28,9 @@ namespace WebFrontend.Controllers
         
         public ActionResult Status(int id)
         {
-            return View(Domain.OpenTabQueries.TabForTable(id));
+            return View(Domain.Dispatcher.QueryAggregate<TabAggregate, TabStatus>(
+                Domain.OpenTabQueries.TabIdForTable(id),
+                tab => tab.GetTabStatus()));
         }
 
         public ActionResult Order(int id)

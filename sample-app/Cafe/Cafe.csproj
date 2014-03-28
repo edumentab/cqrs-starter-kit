@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tab\CloseTab.cs" />
+    <Compile Include="Tab\DTOs.cs" />
     <Compile Include="Tab\Exceptions.cs" />
     <Compile Include="Tab\MarkDrinksServed.cs" />
     <Compile Include="Tab\MarkFoodPrepared.cs" />
