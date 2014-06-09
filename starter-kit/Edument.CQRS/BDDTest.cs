@@ -11,8 +11,7 @@ using NUnit.Framework;
 namespace Edument.CQRS
 {
     /// <summary>
-    /// Provides infrastructure for a set of tests on a given command handler
-    /// and aggregate.
+    /// Provides infrastructure for a set of tests on a given aggregate.
     /// </summary>
     /// <typeparam name="TAggregate"></typeparam>
     public class BDDTest<TAggregate>
@@ -113,7 +112,7 @@ namespace Edument.CQRS
             var handler = sut as IHandleCommand<TCommand>;
             if (handler == null)
                 throw new CommandHandlerNotDefiendException(string.Format(
-                    "Command handler {0} does not yet handle command {1}",
+                    "Aggregate {0} does not yet handle command {1}",
                     sut.GetType().Name, c.GetType().Name));
             return handler.Handle(c);
         }
