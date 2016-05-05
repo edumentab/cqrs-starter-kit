@@ -26,6 +26,22 @@ namespace WebFrontend.Controllers
             return RedirectToAction("Order", new { id = cmd.TableNumber });
         }
         
+        public ActionResult Close(int id) {
+            return View(new CloseModel 
+            {
+                Id = id
+            });
+        }
+
+        [HttpPost]
+        public ActionResult Close(CloseModel model) {
+            Domain.Dispatcher.SendCommand(new CloseTab {
+                 Id = Domain.OpenTabQueries.TabIdForTable(model.Id),
+                 AmountPaid = model.AmountPaid
+            });
+            return RedirectToAction("Index", "Home");
+        }
+
         public ActionResult Status(int id)
         {
             return View(Domain.OpenTabQueries.TabForTable(id));
