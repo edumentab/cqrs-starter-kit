@@ -7,6 +7,10 @@
 <h2>Tab For Table @Model.TableNumber</h2>
 
 <div>
+    <i class="icon-remove"></i>
+    @Html.ActionLink("Close Table", "Close", new { id = Model.TableNumber })
+</div>
+<div>
   <i class="icon-plus"></i>
   @Html.ActionLink("Order Food/Drink", "Order", new { id = Model.TableNumber })
 </div>

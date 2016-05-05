@@ -1,0 +1,18 @@
+﻿@model WebFrontend.Models.CloseModel
+
+@{
+    ViewBag.Title = "Close";
+}
+
+<h2>Close Tab</h2>
+
+@using (Html.BeginForm()) {
+    @Html.HiddenFor(m => m.Id)
+    <fieldset>
+        <label>Amount Paid</label>
+        @Html.TextBoxFor(m => m.AmountPaid)
+
+        <br>
+        <button type="submit" class="btn">Close Tab</button>
+    </fieldset>
+}
