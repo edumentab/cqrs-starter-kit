@@ -68,7 +68,7 @@ experience the same need, and follow the same path.
 
 ## So, how do I get started?
 
-Clone the repository, then take a look at the [tutorial](http://cqrs.nu/tutorial),
+Clone the repository, then take a look at the [tutorial](https://cqrs.nu),
 which walks through the [sample application](https://github.com/edumentab/cqrs-starter-kit/tree/master/sample-app).
 
 You will need a C# compiler. The starter kit uses language features from C# 3,
@@ -78,7 +78,7 @@ Studio 2010.
 You also need NUnit installed, and may need to correct the reference to it
 when first loading the project.
 
-You may also find our [DDD and CQRS FAQ](http://cqrs.nu/) useful.
+You may also find our [DDD and CQRS FAQ](https://cqrs.nu/) useful.
 
 ## I want to do CQRS; is this for me?
 
