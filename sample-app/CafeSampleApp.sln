@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CafeTests", "CafeTests\Cafe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CafeReadModels", "CafeReadModels\CafeReadModels.csproj", "{6F605353-EDF1-4EC1-900C-4C55C105E24C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspFrontend", "AspFrontend\AspFrontend.csproj", "{5C4FBB02-9639-4250-89A4-AB96C0441DE1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{6F605353-EDF1-4EC1-900C-4C55C105E24C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F605353-EDF1-4EC1-900C-4C55C105E24C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F605353-EDF1-4EC1-900C-4C55C105E24C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C4FBB02-9639-4250-89A4-AB96C0441DE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C4FBB02-9639-4250-89A4-AB96C0441DE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C4FBB02-9639-4250-89A4-AB96C0441DE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C4FBB02-9639-4250-89A4-AB96C0441DE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
