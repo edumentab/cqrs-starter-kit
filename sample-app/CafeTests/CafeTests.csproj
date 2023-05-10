@@ -3,7 +3,7 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="nunit" Version="3.12.0" />
+      <PackageReference Include="nunit" Version="3.13.3" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\Events\Events.csproj" />

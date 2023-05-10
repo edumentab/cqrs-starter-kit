@@ -1,9 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFrameworks>net48;netcoreapp3.1</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="nunit" Version="3.12.0" />
-      <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+      <PackageReference Include="nunit" Version="3.13.3" />
+      <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    </ItemGroup>
+    <ItemGroup>
+      <Reference Include="Microsoft.CSharp" Condition="'$(TargetFramework)' == 'net48'" />
     </ItemGroup>
 </Project>

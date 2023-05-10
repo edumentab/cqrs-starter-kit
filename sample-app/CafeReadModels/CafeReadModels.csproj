@@ -4,6 +4,6 @@
       <ProjectReference Include="..\Edument.CQRS\Edument.CQRS.csproj" />
     </ItemGroup>
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFrameworks>net48;netcoreapp3.1</TargetFrameworks>
     </PropertyGroup>
 </Project>
