@@ -1,0 +1,32 @@
+﻿@model Dictionary<int, List<CafeReadModels.OpenTabs.TabItem>>
+
+@{
+    ViewData["Title"] = "Todo List For " + ViewData["Waiter"];
+}
+
+<h2>Todo List For @ViewData["Waiter"]</h2>
+
+@foreach (var table in Model)
+{
+    <h3>Table @table.Key</h3>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Menu #</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in table.Value)
+        {
+            <tr>
+              <td>@item.MenuNumber</td>
+              <td>@item.Description</td>
+            </tr>
+        }
+      </tbody>
+    </table>
+    
+    @Html.ActionLink("Go To Tab", "Status", "Tab", new { id = table.Key }, null)
+}

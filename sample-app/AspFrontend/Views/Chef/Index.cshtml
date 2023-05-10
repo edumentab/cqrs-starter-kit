@@ -1,0 +1,38 @@
+﻿@model List<CafeReadModels.ChefTodoList.TodoListGroup>
+
+@{
+    ViewData["Title"] = "Chef Todo List";
+}
+
+<h2>Meals To Prepare</h2>
+
+@foreach (var group in Model)
+{
+    var i = 0;
+    using (Html.BeginForm("MarkPrepared", "Chef"))
+    {
+        @Html.Hidden("id", group.Tab)
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Menu #</th>
+              <th>Description</th>
+              <th>Prepared</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var item in group.Items)
+            {
+                <tr>
+                  <td>@item.MenuNumber</td>
+                  <td>@item.Description</td>
+                  <td>@Html.CheckBox(string.Format("prepared_{0}_{1}", i++, item.MenuNumber.ToString()))</td>
+                </tr>
+            }
+          </tbody>
+        </table>
+        
+        <button type="submit" class="btn">Mark Prepared</button>
+        <hr />
+    }
+}
