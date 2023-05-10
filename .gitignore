@@ -9,3 +9,4 @@ repositories.config
 [Oo]bj/
 *.csproj.user
 .idea/
+*.DotSettings.user
